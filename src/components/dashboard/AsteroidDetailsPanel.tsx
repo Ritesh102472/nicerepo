@@ -1,14 +1,23 @@
 import { Asteroid } from '@/types/asteroid';
 import { motion } from 'framer-motion';
-import { AlertTriangle, ExternalLink, Target } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Target, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface AsteroidDetailsPanelProps {
   asteroid: Asteroid | null;
   onViewImpact: () => void;
   onInspect?: () => void;
+  isWatched?: boolean;
+  onToggleWatch?: () => void;
 }
 
-export const AsteroidDetailsPanel = ({ asteroid, onViewImpact, onInspect }: AsteroidDetailsPanelProps) => {
+export const AsteroidDetailsPanel = ({ 
+  asteroid, 
+  onViewImpact, 
+  onInspect,
+  isWatched = false,
+  onToggleWatch,
+}: AsteroidDetailsPanelProps) => {
   if (!asteroid) {
     return (
       <div className="h-full flex items-center justify-center p-6">
@@ -45,6 +54,28 @@ export const AsteroidDetailsPanel = ({ asteroid, onViewImpact, onInspect }: Aste
       transition={{ duration: 0.3 }}
       className="h-full flex flex-col"
     >
+      {/* Watchlist Toggle */}
+      {onToggleWatch && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4"
+        >
+          <Button
+            variant="outline"
+            onClick={onToggleWatch}
+            className={`w-full font-rajdhani transition-all ${
+              isWatched 
+                ? 'bg-warning/20 border-warning text-warning hover:bg-warning/30' 
+                : 'border-border hover:border-warning hover:text-warning'
+            }`}
+          >
+            <Star className={`w-4 h-4 mr-2 ${isWatched ? 'fill-current' : ''}`} />
+            {isWatched ? 'Remove from Watchlist' : 'Add to Watchlist'}
+          </Button>
+        </motion.div>
+      )}
+
       <div className="space-y-3 flex-1">
         {details.map((detail) => (
           <div key={detail.label} className="flex justify-between items-center py-1 border-b border-border/30">
