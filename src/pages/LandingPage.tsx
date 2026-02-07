@@ -8,27 +8,13 @@ const LandingPage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Animated Sky Background - Slow rotation effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div 
-          initial={{ x: 0 }}
-          animate={{ x: '-10%' }}
-          transition={{ 
-            duration: 120, 
-            repeat: Infinity, 
-            ease: "linear",
-            repeatType: "loop"
-          }}
-          className="absolute inset-0 w-[120%] h-full"
-          style={{ 
-            backgroundImage: `url(${heroBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center center',
-            imageRendering: 'crisp-edges'
-          }}
-        />
-        {/* Subtle gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-transparent to-background/60" />
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${heroBg})` }}
+      >
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background/80" />
       </div>
 
       {/* Scanline effect */}
@@ -81,6 +67,26 @@ const LandingPage = () => {
           </motion.button>
         </motion.div>
 
+        {/* Decorative elements */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.6 }}
+          transition={{ duration: 1, delay: 1 }}
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+        >
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-xs font-rajdhani tracking-widest text-muted-foreground">
+              SCROLL TO EXPLORE
+            </span>
+            <motion.div
+              animate={{ y: [0, 8, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="w-6 h-10 border-2 border-muted-foreground/50 rounded-full flex justify-center pt-2"
+            >
+              <div className="w-1.5 h-3 bg-primary rounded-full" />
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Features Section */}
