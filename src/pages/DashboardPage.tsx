@@ -7,13 +7,21 @@ import { MonthSelector } from '@/components/dashboard/MonthSelector';
 import { AsteroidListItem } from '@/components/dashboard/AsteroidListItem';
 import { AsteroidDetailsPanel } from '@/components/dashboard/AsteroidDetailsPanel';
 import { ImpactModal } from '@/components/dashboard/ImpactModal';
-import { getAsteroidsByMonth, calculateImpactScenario } from '@/data/mockAsteroids';
+import { AlertSettingsModal } from '@/components/dashboard/AlertSettingsModal';
+import { WatchlistPanel } from '@/components/dashboard/WatchlistPanel';
+import { CommunityChat } from '@/components/dashboard/CommunityChat';
+import { getAsteroidsByMonth, calculateImpactScenario, mockAsteroids } from '@/data/mockAsteroids';
 import { Asteroid, ImpactScenario } from '@/types/asteroid';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Globe, LayoutDashboard, LogOut, HelpCircle } from 'lucide-react';
+import { useWatchlist } from '@/hooks/useWatchlist';
+import { useAlertSettings } from '@/hooks/useAlertSettings';
+import { useAlertNotifications } from '@/hooks/useAlertNotifications';
+import { useToast } from '@/hooks/use-toast';
+import { Globe, LayoutDashboard, LogOut, HelpCircle, Bell, Star, MessageCircle } from 'lucide-react';
 
 const DashboardPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const asteroidGroups = useMemo(() => getAsteroidsByMonth(), []);
   
   const [selectedMonth, setSelectedMonth] = useState<string | null>(
@@ -23,6 +31,18 @@ const DashboardPage = () => {
   const [impactScenario, setImpactScenario] = useState<ImpactScenario | null>(null);
   const [showImpactModal, setShowImpactModal] = useState(false);
   const [showRiskModal, setShowRiskModal] = useState(false);
+  const [showAlertSettingsModal, setShowAlertSettingsModal] = useState(false);
+  const [showChatPanel, setShowChatPanel] = useState(false);
+
+  // Hooks for watchlist and alerts
+  const { watchlist, addToWatchlist, removeFromWatchlist, isWatched } = useWatchlist();
+  const { settings: alertSettings, updateSettings: updateAlertSettings, resetSettings: resetAlertSettings } = useAlertSettings();
+
+  // Enable alert notifications
+  useAlertNotifications({ 
+    settings: alertSettings, 
+    watchedAsteroidIds: watchlist.map(w => w.asteroidId) 
+  });
 
   const currentAsteroids = useMemo(() => {
     if (!selectedMonth) return [];
@@ -45,6 +65,24 @@ const DashboardPage = () => {
   const handleInspectAsteroid = () => {
     if (selectedAsteroid) {
       navigate(`/asteroid/${selectedAsteroid.id}`);
+    }
+  };
+
+  const handleToggleWatch = () => {
+    if (!selectedAsteroid) return;
+    
+    if (isWatched(selectedAsteroid.id)) {
+      removeFromWatchlist(selectedAsteroid.id);
+      toast({
+        title: 'Removed from Watchlist',
+        description: `${selectedAsteroid.name} has been removed from your watchlist.`,
+      });
+    } else {
+      addToWatchlist(selectedAsteroid.id);
+      toast({
+        title: 'Added to Watchlist',
+        description: `${selectedAsteroid.name} is now being tracked.`,
+      });
     }
   };
 
@@ -71,11 +109,33 @@ const DashboardPage = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setShowChatPanel(!showChatPanel)}
+              className={`flex items-center gap-2 px-3 py-2 border rounded-lg font-rajdhani transition-colors ${
+                showChatPanel 
+                  ? 'bg-primary/20 border-primary text-primary' 
+                  : 'bg-secondary/50 border-border text-muted-foreground hover:text-foreground hover:border-primary'
+              }`}
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span className="hidden md:inline text-sm">Chat</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAlertSettingsModal(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-secondary/50 border border-border rounded-lg text-muted-foreground font-rajdhani hover:text-foreground hover:border-primary transition-colors"
+            >
+              <Bell className="w-4 h-4" />
+              <span className="hidden md:inline text-sm">Alerts</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setShowRiskModal(true)}
               className="flex items-center gap-2 px-3 py-2 bg-secondary/50 border border-border rounded-lg text-muted-foreground font-rajdhani hover:text-foreground hover:border-primary transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
-              <span className="hidden md:inline text-sm">How Risk Is Calculated</span>
+              <span className="hidden md:inline text-sm">Risk Info</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -109,17 +169,17 @@ const DashboardPage = () => {
         </motion.div>
 
         {/* Main Grid */}
-        <div className="grid lg:grid-cols-12 gap-6">
-          {/* Left Panel - Month Selector */}
+        <div className={`grid gap-6 ${showChatPanel ? 'lg:grid-cols-12' : 'lg:grid-cols-12'}`}>
+          {/* Left Panel - Month Selector & Watchlist */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
-            className="lg:col-span-3"
+            className={showChatPanel ? 'lg:col-span-2' : 'lg:col-span-3'}
           >
             <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-4">
               <p className="text-sm text-muted-foreground font-rajdhani mb-4">
-                Asteroids segregated by closest approach date to Earth
+                Asteroids by closest approach date
               </p>
               <MonthSelector
                 groups={asteroidGroups}
@@ -127,9 +187,29 @@ const DashboardPage = () => {
                 onSelectMonth={setSelectedMonth}
               />
 
+              {/* Watchlist Section */}
+              <div className="mt-6 pt-6 border-t border-border">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-4 h-4 text-warning" />
+                  <h3 className="font-orbitron text-sm text-foreground">
+                    MY WATCHLIST
+                  </h3>
+                  <span className="ml-auto text-xs text-muted-foreground font-rajdhani">
+                    {watchlist.length}
+                  </span>
+                </div>
+                <WatchlistPanel
+                  watchlist={watchlist}
+                  asteroids={mockAsteroids}
+                  onSelectAsteroid={handleAsteroidClick}
+                  onRemoveFromWatchlist={removeFromWatchlist}
+                  selectedAsteroidId={selectedAsteroid?.id}
+                />
+              </div>
+
               {/* ISS Live Feed Section */}
               <div className="mt-6 pt-6 border-t border-border">
-                <h3 className="font-orbitron text-lg text-foreground mb-2">
+                <h3 className="font-orbitron text-sm text-foreground mb-2">
                   Live from the ISS
                 </h3>
                 <p className="text-xs text-muted-foreground font-rajdhani mb-3">
@@ -153,12 +233,12 @@ const DashboardPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="lg:col-span-5"
+            className={showChatPanel ? 'lg:col-span-4' : 'lg:col-span-5'}
           >
             <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-4 h-full">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-muted-foreground font-rajdhani">
-                  Click an asteroid card for inspection. View full details page for risk analysis.
+                  Click an asteroid card for inspection
                 </p>
                 <span className="text-primary text-xl">▼</span>
               </div>
@@ -188,16 +268,32 @@ const DashboardPage = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
-            className="lg:col-span-4"
+            className={showChatPanel ? 'lg:col-span-3' : 'lg:col-span-4'}
           >
             <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl p-4 h-full">
               <AsteroidDetailsPanel
                 asteroid={selectedAsteroid}
                 onViewImpact={handleViewImpact}
                 onInspect={handleInspectAsteroid}
+                isWatched={selectedAsteroid ? isWatched(selectedAsteroid.id) : false}
+                onToggleWatch={selectedAsteroid ? handleToggleWatch : undefined}
               />
             </div>
           </motion.div>
+
+          {/* Chat Panel (conditionally shown) */}
+          {showChatPanel && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="lg:col-span-3"
+            >
+              <CommunityChat 
+                asteroidContext={selectedAsteroid?.name}
+              />
+            </motion.div>
+          )}
         </div>
       </div>
 
@@ -212,6 +308,15 @@ const DashboardPage = () => {
       <RiskExplanationModal
         isOpen={showRiskModal}
         onClose={() => setShowRiskModal(false)}
+      />
+
+      {/* Alert Settings Modal */}
+      <AlertSettingsModal
+        isOpen={showAlertSettingsModal}
+        onClose={() => setShowAlertSettingsModal(false)}
+        settings={alertSettings}
+        onUpdateSettings={updateAlertSettings}
+        onResetSettings={resetAlertSettings}
       />
     </div>
   );
