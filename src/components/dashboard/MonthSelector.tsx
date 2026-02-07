@@ -19,10 +19,10 @@ export const MonthSelector = ({ groups, selectedMonth, onSelectMonth }: MonthSel
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onSelectMonth(`${group.month} ${group.year}`)}
-          className={`w-full text-left p-3 border-2 rounded transition-all font-orbitron text-sm tracking-wider ${
+          className={`w-full text-left p-3 border rounded-sm transition-all font-mono text-xs uppercase tracking-wider ${
             selectedMonth === `${group.month} ${group.year}`
-              ? 'border-primary text-primary bg-primary/10'
-              : 'border-destructive/50 text-foreground hover:border-destructive'
+              ? 'border-cyan-500/50 text-cyan-400 bg-cyan-500/10'
+              : 'border-white/10 text-gray-400 hover:border-cyan-500/50 hover:text-white'
           }`}
         >
           {group.month.toUpperCase()} {group.year} ASTEROIDS

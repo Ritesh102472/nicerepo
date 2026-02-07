@@ -116,6 +116,45 @@ export const AlertSettingsModal = ({
             </p>
           </div>
 
+          {/* Minimum Risk Score (0–100) - stored in localStorage; later backend will persist */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="font-orbitron text-xs text-muted-foreground">
+                MINIMUM RISK SCORE
+              </Label>
+              <span className="text-sm font-rajdhani text-primary">
+                {settings.minRiskScore}
+              </span>
+            </div>
+            <Slider
+              value={[settings.minRiskScore]}
+              onValueChange={([value]) => onUpdateSettings({ minRiskScore: value })}
+              min={0}
+              max={100}
+              step={1}
+              disabled={!settings.enabled}
+              className="w-full"
+            />
+            <p className="text-xs text-muted-foreground font-rajdhani">
+              Only alert for asteroids at or above this risk score (0–100)
+            </p>
+          </div>
+
+          {/* Only Hazardous Asteroids - stored in localStorage; later backend will persist */}
+          <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg border border-border">
+            <div>
+              <Label className="font-orbitron text-sm">Only Hazardous Asteroids</Label>
+              <p className="text-xs text-muted-foreground font-rajdhani">
+                Only show alerts for NASA-classified hazardous objects
+              </p>
+            </div>
+            <Switch
+              checked={settings.onlyHazardous}
+              onCheckedChange={(checked) => onUpdateSettings({ onlyHazardous: checked })}
+              disabled={!settings.enabled}
+            />
+          </div>
+
           {/* Minimum Diameter */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">

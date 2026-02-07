@@ -62,7 +62,7 @@ const PlanetarySafetyIndex = () => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-card/80 backdrop-blur-sm border border-border rounded-xl p-6"
+      className="bg-black/35 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:border-cyan-500/50 transition-colors"
     >
       <div className="flex flex-col md:flex-row items-center gap-6">
         {/* Circular Gauge */}
@@ -105,7 +105,7 @@ const PlanetarySafetyIndex = () => {
             >
               {safetyScore}
             </motion.span>
-            <span className="text-xs text-muted-foreground font-rajdhani">/ 100</span>
+            <span className="text-xs text-gray-400 font-mono">/ 100</span>
           </div>
         </div>
 
@@ -116,8 +116,8 @@ const PlanetarySafetyIndex = () => {
               <span className={statusColor}>{getStatusIcon()}</span>
             </div>
             <div>
-              <h2 className="text-lg font-orbitron text-foreground">PLANETARY SAFETY INDEX</h2>
-              <p className="text-xs text-muted-foreground font-rajdhani">GLOBAL THREAT ASSESSMENT</p>
+              <h2 className="text-lg font-orbitron font-bold text-white tracking-widest">PLANETARY SAFETY INDEX</h2>
+              <p className="text-xs text-gray-400 font-mono uppercase">GLOBAL THREAT ASSESSMENT</p>
             </div>
           </div>
           
@@ -137,7 +137,7 @@ const PlanetarySafetyIndex = () => {
             <span className={`text-xl font-orbitron font-bold ${statusColor}`}>{status}</span>
           </motion.div>
 
-          <p className="mt-3 text-sm text-muted-foreground font-rajdhani max-w-md">
+          <p className="mt-3 text-sm text-gray-400 font-mono max-w-md">
             {status === 'SAFE' && 'All tracked near-Earth objects are within safe parameters. No immediate threats detected.'}
             {status === 'WATCH' && 'Elevated monitoring level. Some objects require continued observation.'}
             {status === 'DANGER' && 'High-risk objects detected. Enhanced monitoring protocols active.'}
@@ -146,16 +146,16 @@ const PlanetarySafetyIndex = () => {
           {/* Quick Stats */}
           <div className="flex gap-4 mt-4 justify-center md:justify-start">
             <div className="text-center">
-              <span className="text-lg font-orbitron text-foreground">{mockAsteroids.filter(a => a.riskScore === 'high').length}</span>
-              <p className="text-[10px] text-muted-foreground font-rajdhani">HIGH RISK</p>
+              <span className="text-lg font-orbitron font-bold text-white">{mockAsteroids.filter(a => a.riskScore === 'high').length}</span>
+              <p className="text-[10px] text-gray-400 font-mono uppercase">HIGH RISK</p>
             </div>
             <div className="text-center">
-              <span className="text-lg font-orbitron text-foreground">{mockAsteroids.filter(a => a.isHazardous).length}</span>
-              <p className="text-[10px] text-muted-foreground font-rajdhani">HAZARDOUS</p>
+              <span className="text-lg font-orbitron font-bold text-white">{mockAsteroids.filter(a => a.isHazardous).length}</span>
+              <p className="text-[10px] text-gray-400 font-mono uppercase">HAZARDOUS</p>
             </div>
             <div className="text-center">
-              <span className="text-lg font-orbitron text-foreground">{mockAsteroids.length}</span>
-              <p className="text-[10px] text-muted-foreground font-rajdhani">TRACKED</p>
+              <span className="text-lg font-orbitron font-bold text-white">{mockAsteroids.length}</span>
+              <p className="text-[10px] text-gray-400 font-mono uppercase">TRACKED</p>
             </div>
           </div>
         </div>

@@ -1,84 +1,70 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Shield, Radio, Loader2 } from 'lucide-react';
+import { loginUser, registerUser } from '@/services/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { Shield, Lock, Radio } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [signupData, setSignupData] = useState({ email: '', password: '', confirmPassword: '' });
+  const [signupData, setSignupData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
-    
-    // Simulate login - in production this would connect to your backend
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const { user } = await loginUser(loginData.email, loginData.password);
       localStorage.setItem('isAuthenticated', 'true');
-      toast({
-        title: 'Access Granted',
-        description: 'Initializing monitoring console...',
-      });
+      if (user.email) localStorage.setItem('userEmail', user.email);
+      if (user.name) localStorage.setItem('userName', user.name);
       navigate('/dashboard');
-    }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setError(null);
     if (signupData.password !== signupData.confirmPassword) {
-      toast({
-        title: 'Verification Failed',
-        description: 'Passwords do not match.',
-        variant: 'destructive',
-      });
+      setError('Passwords do not match.');
       return;
     }
-
     setIsLoading(true);
-    
-    // Simulate signup - in production this would connect to your backend
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const { user } = await registerUser(signupData.email, signupData.password);
       localStorage.setItem('isAuthenticated', 'true');
-      toast({
-        title: 'Account Created',
-        description: 'Welcome to Cosmic Watch monitoring system.',
-      });
+      if (user.email) localStorage.setItem('userEmail', user.email);
+      if (user.name) localStorage.setItem('userName', user.name);
       navigate('/dashboard');
-    }, 1500);
-  };
-
-  const handleGoogleLogin = () => {
-    setIsLoading(true);
-    // Simulate Google login - in production this would use OAuth
-    setTimeout(() => {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
+    } finally {
       setIsLoading(false);
-      localStorage.setItem('isAuthenticated', 'true');
-      toast({
-        title: 'Google Sign-In Successful',
-        description: 'Initializing monitoring console...',
-      });
-      navigate('/dashboard');
-    }, 1500);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden bg-black text-white">
       {/* Animated stars background */}
       <div className="absolute inset-0">
         {[...Array(50)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-foreground/60 rounded-full"
+            className="absolute w-1 h-1 bg-white/60 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -96,124 +82,72 @@ const LoginPage = () => {
         ))}
       </div>
 
-      {/* Grid overlay effect */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }} />
-      </div>
+      <div
+        className="absolute inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:100px_100px] pointer-events-none"
+        aria-hidden
+      />
 
-      {/* Login Card */}
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="w-full max-w-md relative z-10"
       >
-        <div className="bg-card/90 backdrop-blur-xl border border-primary/30 rounded-xl overflow-hidden">
-          {/* Security Header */}
-          <div className="bg-secondary/80 border-b border-primary/30 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Radio className="w-4 h-4 text-primary animate-pulse" />
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-safe rounded-full" />
-                </div>
-                <span className="text-xs font-orbitron text-primary">SECURE CHANNEL</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Lock className="w-3 h-3 text-safe" />
-                <span className="text-[10px] text-safe font-rajdhani">ENCRYPTED</span>
-              </div>
+        <div className="panel-glass rounded-xl overflow-hidden">
+          <div className="bg-black/40 border-b border-white/10 px-6 py-4">
+            <div className="flex items-center gap-2">
+              <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <span className="text-xs font-mono text-cyan-400 uppercase tracking-wider">
+                SECURE CHANNEL
+              </span>
             </div>
           </div>
 
           <div className="p-8">
-            {/* Header */}
             <div className="text-center mb-8">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', delay: 0.2 }}
-                className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 border-2 border-primary/50 flex items-center justify-center relative"
-                style={{
-                  boxShadow: '0 0 30px hsl(var(--primary) / 0.3)',
-                }}
+                className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 border-2 border-cyan-500/50 flex items-center justify-center relative"
+                style={{ boxShadow: '0 0 30px rgba(34, 211, 238, 0.3)' }}
               >
-                <Shield className="w-10 h-10 text-primary" />
-                <motion.div
-                  className="absolute inset-0 rounded-full border-2 border-primary/30"
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
+                <Shield className="w-10 h-10 text-cyan-400" />
               </motion.div>
-              <h1 className="text-xl font-orbitron font-bold text-foreground tracking-wider">
+              <h1 className="text-xl font-orbitron font-bold text-white tracking-widest">
                 COSMIC WATCH
               </h1>
-              <p className="text-primary text-sm mt-1 font-orbitron">
+              <p className="text-cyan-400 text-sm mt-1 font-mono uppercase tracking-wider">
                 MONITORING CONSOLE
               </p>
             </div>
 
-            {/* Google Sign-In Button */}
-            <Button
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-              className="w-full mb-6 font-rajdhani tracking-wider bg-card border border-border text-foreground hover:bg-secondary hover:border-primary transition-all flex items-center justify-center gap-3"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-              </svg>
-              {isLoading ? 'SIGNING IN...' : 'CONTINUE WITH GOOGLE'}
-            </Button>
-
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border"></div>
+            {error && (
+              <div className="mb-4 p-3 rounded-sm bg-red-500/20 border border-red-500/50 text-red-400 text-sm font-mono">
+                {error}
               </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-card text-muted-foreground font-rajdhani">OR</span>
-              </div>
-            </div>
+            )}
 
-            {/* Tabs */}
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-secondary/80 border border-border">
-                <TabsTrigger 
-                  value="login" 
-                  className="font-orbitron text-xs data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-black/40 border border-white/10">
+                <TabsTrigger
+                  value="login"
+                  className="font-mono text-xs uppercase data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 data-[state=inactive]:text-gray-400"
                 >
                   SIGN IN
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="signup"
-                  className="font-orbitron text-xs data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+                <TabsTrigger
+                  value="register"
+                  className="font-mono text-xs uppercase data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400 data-[state=inactive]:text-gray-400"
                 >
                   REGISTER
                 </TabsTrigger>
               </TabsList>
 
-              {/* Login Form */}
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="font-orbitron text-xs text-muted-foreground tracking-wider">
+                    <Label htmlFor="email" className="font-mono text-xs text-gray-400 uppercase tracking-wider">
                       EMAIL
                     </Label>
                     <Input
@@ -222,12 +156,12 @@ const LoginPage = () => {
                       placeholder="you@example.com"
                       value={loginData.email}
                       onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                      className="bg-secondary/50 border-border focus:border-primary font-rajdhani"
+                      className="bg-black/60 border-white/10 text-white placeholder:text-gray-500 font-sans focus:border-cyan-500/50"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="font-orbitron text-xs text-muted-foreground tracking-wider">
+                    <Label htmlFor="password" className="font-mono text-xs text-gray-400 uppercase tracking-wider">
                       PASSWORD
                     </Label>
                     <Input
@@ -236,28 +170,31 @@ const LoginPage = () => {
                       placeholder="••••••••••••"
                       value={loginData.password}
                       onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      className="bg-secondary/50 border-border focus:border-primary font-rajdhani"
+                      className="bg-black/60 border-white/10 text-white placeholder:text-gray-500 font-sans focus:border-cyan-500/50"
                       required
                     />
                   </div>
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full font-orbitron tracking-wider bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all"
-                    style={{
-                      boxShadow: isLoading ? 'none' : '0 0 20px hsl(var(--primary) / 0.3)',
-                    }}
+                    className="w-full font-mono text-xs uppercase tracking-wider bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/30 transition-all flex items-center justify-center gap-2"
                   >
-                    {isLoading ? 'AUTHENTICATING...' : 'SIGN IN'}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        ENTERING…
+                      </>
+                    ) : (
+                      'ENTER MONITORING CONSOLE'
+                    )}
                   </Button>
                 </form>
               </TabsContent>
 
-              {/* Signup Form */}
-              <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4">
+              <TabsContent value="register">
+                <form onSubmit={handleRegister} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="font-orbitron text-xs text-muted-foreground tracking-wider">
+                    <Label htmlFor="signup-email" className="font-mono text-xs text-gray-400 uppercase tracking-wider">
                       EMAIL
                     </Label>
                     <Input
@@ -266,12 +203,12 @@ const LoginPage = () => {
                       placeholder="you@example.com"
                       value={signupData.email}
                       onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                      className="bg-secondary/50 border-border focus:border-primary font-rajdhani"
+                      className="bg-black/60 border-white/10 text-white placeholder:text-gray-500 font-sans focus:border-cyan-500/50"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="font-orbitron text-xs text-muted-foreground tracking-wider">
+                    <Label htmlFor="signup-password" className="font-mono text-xs text-gray-400 uppercase tracking-wider">
                       PASSWORD
                     </Label>
                     <Input
@@ -280,12 +217,12 @@ const LoginPage = () => {
                       placeholder="••••••••••••"
                       value={signupData.password}
                       onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                      className="bg-secondary/50 border-border focus:border-primary font-rajdhani"
+                      className="bg-black/60 border-white/10 text-white placeholder:text-gray-500 font-sans focus:border-cyan-500/50"
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="font-orbitron text-xs text-muted-foreground tracking-wider">
+                    <Label htmlFor="confirm-password" className="font-mono text-xs text-gray-400 uppercase tracking-wider">
                       CONFIRM PASSWORD
                     </Label>
                     <Input
@@ -294,39 +231,42 @@ const LoginPage = () => {
                       placeholder="••••••••••••"
                       value={signupData.confirmPassword}
                       onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-                      className="bg-secondary/50 border-border focus:border-primary font-rajdhani"
+                      className="bg-black/60 border-white/10 text-white placeholder:text-gray-500 font-sans focus:border-cyan-500/50"
                       required
                     />
                   </div>
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full font-orbitron tracking-wider bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all"
-                    style={{
-                      boxShadow: isLoading ? 'none' : '0 0 20px hsl(var(--primary) / 0.3)',
-                    }}
+                    className="w-full font-mono text-xs uppercase tracking-wider bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/30 transition-all flex items-center justify-center gap-2"
                   >
-                    {isLoading ? 'PROCESSING...' : 'CREATE ACCOUNT'}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        CREATING…
+                      </>
+                    ) : (
+                      'CREATE ACCOUNT'
+                    )}
                   </Button>
                 </form>
               </TabsContent>
             </Tabs>
 
-            {/* Back to home link */}
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <button
+                type="button"
                 onClick={() => navigate('/')}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors font-rajdhani"
+                className="text-sm text-gray-400 hover:text-cyan-400 transition-colors font-mono"
               >
                 ← Return to Home
               </button>
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="bg-secondary/50 border-t border-border px-6 py-3">
-            <p className="text-[10px] text-muted-foreground text-center font-rajdhani">
-              COSMIC WATCH v2.1.0 • PLANETARY DEFENSE MONITORING SYSTEM
+          <div className="bg-black/40 border-t border-white/10 px-6 py-3">
+            <p className="text-[10px] text-gray-500 text-center font-mono uppercase">
+              COSMIC WATCH
             </p>
           </div>
         </div>

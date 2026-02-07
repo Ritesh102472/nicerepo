@@ -102,19 +102,19 @@ export const CommunityChat = ({ asteroidContext }: CommunityChatProps) => {
   };
 
   return (
-    <div className="bg-card/50 backdrop-blur-sm border border-border rounded-xl overflow-hidden h-full flex flex-col">
+    <div className="panel-glass rounded-xl overflow-hidden h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-border bg-secondary/30">
+      <div className="px-4 py-3 border-b border-white/10 bg-black/25">
         <div className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-primary" />
-          <span className="font-orbitron text-sm text-foreground">COMMUNITY CHAT</span>
-          <span className="ml-auto text-xs text-muted-foreground font-rajdhani">
+          <MessageCircle className="w-4 h-4 text-cyan-400" />
+          <span className="font-orbitron text-sm font-bold tracking-widest text-white">COMMUNITY CHAT</span>
+          <span className="ml-auto text-xs text-gray-400 font-mono">
             {simulatedUsers.length} online
           </span>
-          <span className="w-2 h-2 bg-safe rounded-full animate-pulse" />
+          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
         </div>
         {asteroidContext && (
-          <p className="text-xs text-primary font-rajdhani mt-1">
+          <p className="text-xs text-cyan-400 font-mono mt-1">
             Discussing: {asteroidContext}
           </p>
         )}
@@ -131,25 +131,23 @@ export const CommunityChat = ({ asteroidContext }: CommunityChatProps) => {
               className={`flex gap-2 ${msg.isCurrentUser ? 'flex-row-reverse' : ''}`}
             >
               <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                msg.isCurrentUser ? 'bg-primary/20' : 'bg-secondary'
+                msg.isCurrentUser ? 'bg-cyan-500/20' : 'bg-white/10'
               }`}>
-                <User className={`w-4 h-4 ${msg.isCurrentUser ? 'text-primary' : 'text-muted-foreground'}`} />
+                <User className={`w-4 h-4 ${msg.isCurrentUser ? 'text-cyan-400' : 'text-gray-400'}`} />
               </div>
               <div className={`max-w-[75%] ${msg.isCurrentUser ? 'text-right' : ''}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`text-xs font-rajdhani ${
-                    msg.isCurrentUser ? 'text-primary' : 'text-muted-foreground'
-                  }`}>
+                  <span className={`text-xs font-mono ${msg.isCurrentUser ? 'text-cyan-400' : 'text-gray-400'}`}>
                     {msg.user}
                   </span>
-                  <span className="text-[10px] text-muted-foreground/70">
+                  <span className="text-[10px] text-gray-500">
                     {formatTime(msg.timestamp)}
                   </span>
                 </div>
-                <div className={`px-3 py-2 rounded-lg text-sm font-rajdhani ${
+                <div className={`px-3 py-2 rounded-sm text-sm font-sans ${
                   msg.isCurrentUser
-                    ? 'bg-primary/20 text-foreground'
-                    : 'bg-secondary text-foreground'
+                    ? 'bg-cyan-500/20 text-white'
+                    : 'bg-black/25 text-white border border-white/10'
                 }`}>
                   {msg.message}
                 </div>
@@ -160,19 +158,19 @@ export const CommunityChat = ({ asteroidContext }: CommunityChatProps) => {
       </ScrollArea>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className="p-3 border-t border-border bg-secondary/20">
+      <form onSubmit={handleSendMessage} className="p-3 border-t border-white/10 bg-black/25">
         <div className="flex gap-2">
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-secondary/50 border-border font-rajdhani text-sm"
+            className="flex-1 bg-black/40 border-white/10 text-white font-mono text-sm placeholder:text-gray-500"
           />
           <Button
             type="submit"
             size="sm"
             disabled={!newMessage.trim()}
-            className="bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            className="bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/30"
           >
             <Send className="w-4 h-4" />
           </Button>

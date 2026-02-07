@@ -30,11 +30,11 @@ export const WatchlistPanel = ({
   if (watchlist.length === 0) {
     return (
       <div className="text-center py-8">
-        <Eye className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-        <p className="text-sm text-muted-foreground font-rajdhani">
+        <Eye className="w-12 h-12 text-gray-500/50 mx-auto mb-3" />
+        <p className="text-sm text-gray-400 font-mono">
           No asteroids in your watchlist
         </p>
-        <p className="text-xs text-muted-foreground/70 font-rajdhani mt-1">
+        <p className="text-xs text-gray-500 font-mono mt-1">
           Click the star icon on any asteroid to add it
         </p>
       </div>
@@ -52,31 +52,31 @@ export const WatchlistPanel = ({
               key={asteroid.id}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className={`flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer ${
+              className={`flex items-center justify-between p-3 rounded-sm border transition-all cursor-pointer ${
                 selectedAsteroidId === asteroid.id
-                  ? 'border-primary bg-primary/10'
-                  : 'border-border bg-secondary/30 hover:border-primary/50'
+                  ? 'border-cyan-500/50 bg-cyan-500/10'
+                  : 'border-white/10 bg-black/40 hover:border-cyan-500/50'
               }`}
               onClick={() => onSelectAsteroid(asteroid)}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Star className="w-4 h-4 text-warning flex-shrink-0" fill="currentColor" />
+                <Star className="w-4 h-4 text-cyan-400 flex-shrink-0" fill="currentColor" />
                 <div className="min-w-0">
-                  <p className="font-rajdhani text-sm text-foreground truncate">
+                  <p className="font-sans text-sm text-white truncate">
                     {asteroid.name}
                   </p>
-                  <p className="text-xs text-muted-foreground font-rajdhani">
+                  <p className="text-xs text-gray-400 font-mono">
                     Added {new Date(addedAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <span className={`text-xs px-2 py-0.5 rounded font-rajdhani ${
-                  asteroid.riskScore === 'high' ? 'bg-destructive/20 text-destructive' :
-                  asteroid.riskScore === 'medium' ? 'bg-warning/20 text-warning' :
-                  'bg-safe/20 text-safe'
+                <span className={`text-xs px-2 py-0.5 rounded font-mono uppercase ${
+                  asteroid.riskScore === 'high' ? 'bg-red-500/20 text-red-400' :
+                  asteroid.riskScore === 'medium' ? 'bg-amber-500/20 text-amber-400' :
+                  'bg-green-500/20 text-green-400'
                 }`}>
-                  {asteroid.riskScore.toUpperCase()}
+                  {asteroid.riskScore}
                 </span>
                 <Button
                   variant="ghost"
@@ -85,7 +85,7 @@ export const WatchlistPanel = ({
                     e.stopPropagation();
                     onRemoveFromWatchlist(asteroid.id);
                   }}
-                  className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                  className="h-7 w-7 p-0 text-gray-400 hover:text-red-400"
                 >
                   <Trash2 className="w-3 h-3" />
                 </Button>

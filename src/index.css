@@ -1,9 +1,9 @@
+/* Cosmic Watch - Space Theme Design System (imports must come first) */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Cosmic Watch - Space Theme Design System */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -84,7 +84,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-rajdhani antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
     background: var(--gradient-space);
     min-height: 100vh;
   }
@@ -101,6 +101,10 @@
 
   .font-rajdhani {
     font-family: 'Rajdhani', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'Space Mono', 'Consolas', monospace;
   }
 
   /* Glowing border effect */
@@ -186,6 +190,16 @@
   /* Card with gradient background */
   .card-gradient {
     background: var(--gradient-card);
+  }
+
+  /* Translucent glass panels for dashboard */
+  .panel-glass {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+  }
+  .panel-glass:hover {
+    border-color: rgba(34, 211, 238, 0.4);
   }
 
   /* Risk indicator colors */

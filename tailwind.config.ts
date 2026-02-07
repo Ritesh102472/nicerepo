@@ -14,8 +14,10 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ['Rajdhani', 'system-ui', 'sans-serif'],
         orbitron: ['Orbitron', 'sans-serif'],
         rajdhani: ['Rajdhani', 'sans-serif'],
+        mono: ['Space Mono', 'Consolas', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",

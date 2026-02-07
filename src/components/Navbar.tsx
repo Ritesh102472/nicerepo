@@ -15,7 +15,7 @@ export const Navbar = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-background/30 backdrop-blur-md border-b border-border/30"
+      className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/10"
     >
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-center gap-8 md:gap-16">
@@ -23,10 +23,10 @@ export const Navbar = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`font-orbitron text-sm md:text-base tracking-widest transition-all duration-300 hover:text-primary ${
+              className={`font-mono text-sm md:text-base tracking-widest transition-all duration-300 uppercase ${
                 location.pathname === item.path
-                  ? 'text-primary'
-                  : 'text-foreground/80'
+                  ? 'text-cyan-400'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               {item.label}

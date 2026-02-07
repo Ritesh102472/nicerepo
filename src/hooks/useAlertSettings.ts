@@ -10,6 +10,10 @@ export interface AlertSettings {
   daysAhead: number; // Show alerts for approaches within X days
   minDiameter: number; // Minimum diameter in meters to trigger alert
   notifyWatchlistOnly: boolean;
+  /** Minimum risk score (0–100). Alerts only for asteroids at or above this. Stored in localStorage; later backend will persist. */
+  minRiskScore: number;
+  /** Only show/alert for hazardous asteroids. Stored in localStorage; later backend will persist. */
+  onlyHazardous: boolean;
 }
 
 const defaultSettings: AlertSettings = {
@@ -20,6 +24,8 @@ const defaultSettings: AlertSettings = {
   daysAhead: 30,
   minDiameter: 0,
   notifyWatchlistOnly: false,
+  minRiskScore: 0,
+  onlyHazardous: false,
 };
 
 export const useAlertSettings = () => {

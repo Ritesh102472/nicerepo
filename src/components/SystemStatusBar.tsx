@@ -66,25 +66,25 @@ const SystemStatusBar = () => {
 
   const getThreatColor = () => {
     switch (threatLevel) {
-      case 'HIGH': return 'text-destructive';
-      case 'ELEVATED': return 'text-warning';
-      default: return 'text-safe';
+      case 'HIGH': return 'text-red-400';
+      case 'ELEVATED': return 'text-amber-400';
+      default: return 'text-green-400';
     }
   };
 
   const getThreatGlow = () => {
     switch (threatLevel) {
-      case 'HIGH': return 'shadow-[0_0_10px_hsl(var(--destructive)/0.5)]';
-      case 'ELEVATED': return 'shadow-[0_0_10px_hsl(var(--warning)/0.5)]';
-      default: return 'shadow-[0_0_10px_hsl(var(--safe)/0.5)]';
+      case 'HIGH': return 'shadow-[0_0_10px_rgba(248,113,113,0.5)]';
+      case 'ELEVATED': return 'shadow-[0_0_10px_rgba(251,191,36,0.5)]';
+      default: return 'shadow-[0_0_10px_rgba(74,222,128,0.5)]';
     }
   };
 
   const getThreatBg = () => {
     switch (threatLevel) {
-      case 'HIGH': return 'bg-destructive/20';
-      case 'ELEVATED': return 'bg-warning/20';
-      default: return 'bg-safe/20';
+      case 'HIGH': return 'bg-red-500/20';
+      case 'ELEVATED': return 'bg-amber-500/20';
+      default: return 'bg-green-500/20';
     }
   };
 
@@ -100,54 +100,54 @@ const SystemStatusBar = () => {
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed top-16 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-b border-border"
+      className="fixed top-16 left-0 right-0 z-40 bg-black/35 backdrop-blur-md border-b border-white/10"
     >
       <div className="max-w-7xl mx-auto px-4 py-2">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           {/* System Status Indicator */}
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Radio className="w-4 h-4 text-primary animate-pulse" />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-safe rounded-full animate-ping" />
+              <Radio className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full animate-ping" />
             </div>
-            <span className="text-xs font-orbitron text-muted-foreground">SYSTEM ACTIVE</span>
+            <span className="text-xs font-mono text-gray-400 uppercase tracking-wider">SYSTEM ACTIVE</span>
           </div>
 
           {/* Earth Threat Level */}
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-lg ${getThreatBg()} ${getThreatGlow()}`}>
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-sm ${getThreatBg()} ${getThreatGlow()}`}>
             <span className={getThreatColor()}>{getThreatIcon()}</span>
             <div className="flex flex-col">
-              <span className="text-[10px] text-muted-foreground font-rajdhani">EARTH THREAT</span>
+              <span className="text-[10px] text-gray-400 font-mono uppercase">EARTH THREAT</span>
               <span className={`text-sm font-orbitron font-bold ${getThreatColor()}`}>{threatLevel}</span>
             </div>
           </div>
 
           {/* Last Scan Time */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-secondary/50 rounded-lg">
-            <Clock className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-2 px-3 py-1 bg-black/25 border border-white/10 rounded-sm">
+            <Clock className="w-4 h-4 text-cyan-400" />
             <div className="flex flex-col">
-              <span className="text-[10px] text-muted-foreground font-rajdhani">LAST SCAN</span>
-              <span className="text-xs font-orbitron text-foreground">
+              <span className="text-[10px] text-gray-400 font-mono uppercase">LAST SCAN</span>
+              <span className="text-xs font-orbitron text-white">
                 {lastScanTime.toLocaleTimeString()}
               </span>
             </div>
           </div>
 
           {/* Active Objects Count */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-secondary/50 rounded-lg">
-            <Target className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-2 px-3 py-1 bg-black/25 border border-white/10 rounded-sm">
+            <Target className="w-4 h-4 text-cyan-400" />
             <div className="flex flex-col">
-              <span className="text-[10px] text-muted-foreground font-rajdhani">ACTIVE OBJECTS</span>
-              <span className="text-xs font-orbitron text-foreground">{mockAsteroids.length}</span>
+              <span className="text-[10px] text-gray-400 font-mono uppercase">ACTIVE OBJECTS</span>
+              <span className="text-xs font-orbitron text-white">{mockAsteroids.length}</span>
             </div>
           </div>
 
           {/* Next Close Approach Countdown */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/30 rounded-lg">
-            <Activity className="w-4 h-4 text-primary" />
+          <div className="flex items-center gap-2 px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-sm">
+            <Activity className="w-4 h-4 text-cyan-400" />
             <div className="flex flex-col">
-              <span className="text-[10px] text-muted-foreground font-rajdhani">NEXT APPROACH</span>
-              <span className="text-xs font-orbitron text-primary font-bold">{countdown}</span>
+              <span className="text-[10px] text-gray-400 font-mono uppercase">NEXT APPROACH</span>
+              <span className="text-xs font-orbitron text-cyan-400 font-bold">{countdown}</span>
             </div>
           </div>
         </div>
