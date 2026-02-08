@@ -1,0 +1,301 @@
+{
+  "info": {
+    "name": "Cosmic Watch API",
+    "description": "Complete API collection for Cosmic Watch - Satellite Monitoring System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/api/user/signup",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "user", "signup"]
+            },
+            "description": "Register a new user account"
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securepassword123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/api/user/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "user", "login"]
+            },
+            "description": "Login with email and password. Copy the token from response and set it in Variables."
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5001/api/user/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "user", "me"]
+            },
+            "description": "Get current authenticated user profile"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Asteroids - Feed",
+      "item": [
+        {
+          "name": "Get NEO Feed",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5001/api/feed?page=0&size=20",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "feed"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2026-02-01",
+                  "disabled": true
+                },
+                {
+                  "key": "end_date",
+                  "value": "2026-02-28",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get feed of Near-Earth Objects. Optional: Add start_date and end_date query params"
+          }
+        },
+        {
+          "name": "Get Feed Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5001/api/stats",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "stats"]
+            },
+            "description": "Get statistics about NEOs and hazardous asteroids"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Asteroids - Lookup",
+      "item": [
+        {
+          "name": "Lookup Asteroid by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5001/api/neo/2000433",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "neo", "2000433"]
+            },
+            "description": "Get detailed information about a specific asteroid by NASA ID. Change the ID in the URL."
+          }
+        },
+        {
+          "name": "Search Asteroids by Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5001/api/neo/search?q=Eros&limit=10",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "neo", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Eros"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Search for asteroids by name or query string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Watchlist",
+      "item": [
+        {
+          "name": "Get Watchlist",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5001/api/watchlist",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "watchlist"]
+            },
+            "description": "Get user's watchlist of asteroids"
+          }
+        },
+        {
+          "name": "Add to Watchlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asteroidId\": \"2000433\",\n  \"asteroidName\": \"Eros\",\n  \"asteroidData\": {\n    \"id\": \"2000433\",\n    \"name\": \"Eros\",\n    \"estimated_diameter\": {\n      \"kilometers\": {\n        \"estimated_diameter_min\": 12.5,\n        \"estimated_diameter_max\": 14.2\n      }\n    },\n    \"is_potentially_hazardous_asteroid\": false\n  },\n  \"notes\": \"Close approach on Feb 14 - high interest\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5001/api/watchlist",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "watchlist"]
+            },
+            "description": "Add an asteroid to user's watchlist"
+          }
+        },
+        {
+          "name": "Remove from Watchlist",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:5001/api/watchlist/507f1f77bcf86cd799439011",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["api", "watchlist", "507f1f77bcf86cd799439011"]
+            },
+            "description": "Remove an asteroid from watchlist by watchlist item ID. Replace the ID in the URL."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:5001/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5001",
+              "path": ["health"]
+            },
+            "description": "Check if the API is running and healthy. No authentication required."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
