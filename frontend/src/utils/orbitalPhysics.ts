@@ -129,18 +129,8 @@ export function getEarthPosition(date: Date = new Date()) {
 
 // Convert AU to 3D Scene Units (e.g., 1 AU = 100 units)
 export const AU_SCALE = 100;
-export const posToVector3 = (pos: { x: number; y: number; z: number }) => {
-    return [pos.x * AU_SCALE, pos.z * AU_SCALE, -pos.y * AU_SCALE] as [number, number, number]; // Y-up in Threejs, Z is depth. Astro Z is "Up" usually. Map Astro Z -> Three Y. Astro Y -> Three -Z?
-    // Standard Math:
-    // X axis: Vernal Equinox
-    // Z axis: North Ecliptic Pole
-    // Y axis: 90 deg East
-    
-    // ThreeJS:
-    // Y is Up.
-    // So Astro Z -> Three Y.
-    // Astro X -> Three X.
-    // Astro Y -> Three -Z (Right Hand Rule).
-    
-    return [pos.x * AU_SCALE, pos.z * AU_SCALE, -pos.y * AU_SCALE] as [number, number, number];
+// Maps heliocentric ecliptic (Astro) coordinates to Three.js scene units.
+// Astro Z (north ecliptic pole) → Three.js Y (up); Astro Y → Three.js -Z.
+export const posToVector3 = (pos: { x: number; y: number; z: number }): [number, number, number] => {
+    return [pos.x * AU_SCALE, pos.z * AU_SCALE, -pos.y * AU_SCALE];
 };

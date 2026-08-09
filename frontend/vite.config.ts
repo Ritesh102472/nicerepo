@@ -4,36 +4,42 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: true,
-    port: 8080,
-    hmr: {
-      overlay: false,
-    },
-    proxy: {
-      "/api": {
-        target: "http://backend:5000",
-        changeOrigin: true,
+export default defineConfig(({ mode }) => {
+  // Used only by the Vite dev server (local development without Docker).
+  // In Docker, nginx handles proxying – this value is ignored in production builds.
+  const backendTarget = process.env.BACKEND_URL ?? "http://localhost:5001";
+
+  return {
+    server: {
+      host: true,
+      port: 8080,
+      hmr: {
+        overlay: false,
       },
-      "/health": {
-        target: "http://backend:5000",
-        changeOrigin: true,
-      },
-      "/socket.io": {
-        target: "http://backend:5000",
-        changeOrigin: true,
-        ws: true,
+      proxy: {
+        "/api": {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        "/health": {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        "/socket.io": {
+          target: backendTarget,
+          changeOrigin: true,
+          ws: true,
+        },
       },
     },
-  },
-  plugins: [
-    react(),
-    mode === "development" && componentTagger(),
-  ].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    plugins: [
+      react(),
+      mode === "development" && componentTagger(),
+    ].filter(Boolean),
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
-  },
-}));
+  };
+});

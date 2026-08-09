@@ -59,8 +59,14 @@ export async function apiRequest<T>(
     throw new Error(res.ok ? text : `Request failed: ${res.status} ${text}`);
   }
   if (!res.ok) {
-    const err = data as { message?: string; errors?: unknown };
-    throw new Error(err?.message || `Request failed: ${res.status}`);
+    const err = data as { message?: string; errors?: Array<{ field?: string; message: string }> };
+    const message =
+      err?.message ||
+      (Array.isArray(err?.errors) && err.errors.length > 0
+        ? err.errors.map((e) => e.message).join(' · ')
+        : null) ||
+      `Request failed: ${res.status}`;
+    throw new Error(message);
   }
   return data;
 }

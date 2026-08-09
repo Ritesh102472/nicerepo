@@ -12,7 +12,7 @@ exports.protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ success: false, message: 'Not authorized to access this route' });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'cosmic-watch-secret-change-in-production');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-only-insecure-jwt-secret');
     req.user = await User.findById(decoded.id);
     if (!req.user) {
       return res.status(401).json({ success: false, message: 'User no longer exists' });
@@ -26,7 +26,7 @@ exports.protect = async (req, res, next) => {
 exports.generateToken = (id) => {
   return jwt.sign(
     { id },
-    process.env.JWT_SECRET || 'cosmic-watch-secret-change-in-production',
+    process.env.JWT_SECRET || 'dev-only-insecure-jwt-secret',
     { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
 };

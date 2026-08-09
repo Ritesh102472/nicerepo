@@ -1,6 +1,6 @@
 import { Asteroid } from "@/types/asteroid";
 
-const NASA_API_KEY = 'u6aosSwzhfX2jYjx8uHwl35hOYEgwUZFC99L2PSw';
+const NASA_API_KEY = import.meta.env.VITE_NASA_API_KEY || 'DEMO_KEY';
 const BASE_URL = 'https://api.nasa.gov/neo/rest/v1/neo';
 
 export interface OrbitalData {

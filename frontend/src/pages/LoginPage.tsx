@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Radio, Loader2, Activity } from 'lucide-react';
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { loginUser, registerUser } from '@/services/auth';
+import { apiRequest } from '@/lib/apiClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,6 +38,27 @@ const LoginPage = () => {
       navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (response: CredentialResponse) => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const data = await apiRequest<{ success: boolean; token: string; user: { id: string; name?: string; email: string } }>(
+        '/api/user/google-auth',
+        { method: 'POST', body: JSON.stringify({ credential: response.credential }), skipAuth: true }
+      );
+      if (!data?.token || !data?.user) throw new Error('Invalid response from server');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('isAuthenticated', 'true');
+      if (data.user.email) localStorage.setItem('userEmail', data.user.email);
+      if (data.user.name) localStorage.setItem('userName', data.user.name);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Google sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -377,7 +400,27 @@ const LoginPage = () => {
               </AnimatePresence>
             </Tabs>
 
-            <div className="mt-8 text-center">
+            {/* Google Sign-In */}
+            <div className="mt-6">
+              <div className="relative flex items-center gap-3 mb-4">
+                <div className="flex-1 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">or continue with</span>
+                <div className="flex-1 border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+              </div>
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => setError('Google sign-in was cancelled or failed.')}
+                  theme="filled_black"
+                  shape="rectangular"
+                  size="large"
+                  text="continue_with"
+                  width="320"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 text-center">
               <motion.button
                 type="button"
                 onClick={() => navigate('/')}

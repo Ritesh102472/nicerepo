@@ -15,11 +15,22 @@ const authRoutes = require('./routes/authRoutes');
 const neoRoutes = require('./routes/neoRoutes');
 const watchlistRoutes = require('./routes/watchlistRoutes');
 
+// Startup validation
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('FATAL: JWT_SECRET environment variable is required in production.');
+    process.exit(1);
+  }
+  console.warn('WARNING: JWT_SECRET not set – using insecure default (development only).');
+}
+
+const ALLOWED_ORIGIN = process.env.FRONTEND_URL || (process.env.NODE_ENV === 'production' ? false : 'http://localhost:8080');
+
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: true, credentials: true },
+  cors: { origin: ALLOWED_ORIGIN, credentials: true },
 });
 app.set('io', io);
 
@@ -30,7 +41,7 @@ app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: true, credentials: true }));
+app.use(cors({ origin: ALLOWED_ORIGIN, credentials: true }));
 app.set('trust proxy', 1);
 
 if (process.env.NODE_ENV === 'development') {

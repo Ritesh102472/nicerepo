@@ -1,792 +1,228 @@
-# 🛰️ Cosmic Watch - Satellite Monitoring System
+# Cosmic Watch
 
-**A real-time satellite and Near-Earth Object (NEO) monitoring dashboard** that tracks asteroids approaching Earth and provides users with critical astronomical data.
+**A real-time Near-Earth Object (NEO) tracking dashboard** — live asteroid data, 3D visualisation, personal watchlists, and an AI-powered impact simulator.
 
----
-
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Project Architecture](#project-architecture)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Installation & Setup](#installation--setup)
-- [Running the Project](#running-the-project)
-- [API Documentation](#api-documentation)
-- [Development Guide](#development-guide)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
+Originally built as a hackathon project, Cosmic Watch is a production-ready full-stack application that pulls live data from [NASA's NeoWs API](https://api.nasa.gov/#NeoWS).
 
 ---
 
-## 🌟 Overview
+## Features
 
-**Cosmic Watch** is a sophisticated satellite monitoring system designed for tracking Near-Earth Objects (NEOs) and providing real-time astronomical data. The application integrates with NASA's NEO API to deliver up-to-date asteroid tracking information with an intuitive, modern interface.
-
-Originally developed as a hackathon project, Cosmic Watch has evolved into a production-ready monitoring platform with:
-- Real-time socket-based updates
-- Secure user authentication
-- Personalized watchlists
-- 3D asteroid visualization
-- Responsive design
-- Mobile-friendly interface
-
----
-
-## ✨ Features
-
-### 🔐 Authentication & Security
-- **Secure Sign-up/Login** - User registration with password hashing (bcryptjs)
-- **JWT Tokens** - Stateless authentication with Bearer tokens
-- **Protected Routes** - Role-based access control for dashboard features
-- **Session Management** - Persistent authentication across sessions
-
-### 🔭 Asteroid Tracking
-- **Real-time NEO Feed** - Live streams of Near-Earth Objects approaching Earth
-- **NASA Data Integration** - Direct API integration with NASA's NEO database
-- **Advanced Search** - Filter asteroids by date range, size, and hazard level
-- **Detailed Metrics** - Diameter, velocity, distance, and orbital parameters
-
-### 📌 Watchlist Management
-- **Personal Watchlists** - Save and track asteroids of interest
-- **Custom Annotations** - Add notes and observations to tracked objects
-- **Quick Actions** - Add/remove items with one click
-- **Persistent Storage** - All watchlist data saved to MongoDB
-
-### 📊 Dashboard Analytics
-- **System Status** - Health monitoring and API status
-- **Asteroid Statistics** - Real-time counts and categorization
-- **Impact Scenarios** - Orbital mechanics and collision probability calculations
-- **Historical Data** - Track asteroid data over time
-
-### 🎨 User Interface
-- **Modern Design** - Built with shadcn/ui components and Tailwind CSS
-- **3D Visualizations** - Three.js-powered asteroid visualization
-- **Responsive Layout** - Seamless experience on desktop, tablet, mobile
-- **Dark Theme** - Cyberpunk-inspired aesthetic with neon accents
-- **Real-time Updates** - Socket.io for live data streaming
-
-### 💬 Real-time Communication
-- **Socket.io Integration** - Bi-directional communication between client and server
-- **Live Notifications** - Instant alerts for critical asteroid events
-- **Chat System** - Built-in messaging for team collaboration
+| Area | What it does |
+|------|-------------|
+| **Asteroid feed** | Live NEO feed filtered by date range, size, or risk level |
+| **Risk scoring** | Proprietary score (0–100) based on diameter, velocity, and miss distance |
+| **3D visualisation** | Three.js Solar System with real orbital mechanics |
+| **Watchlist** | Save and annotate asteroids; persisted to MongoDB per user |
+| **Impact simulator** | Physics-based impact scenario + optional AI narrative (OpenAI) |
+| **Live chat** | Per-asteroid community discussion via Socket.io |
+| **Auth** | JWT + httpOnly cookie; signup, login, protected routes |
 
 ---
 
-## 🏗️ Project Architecture
+## Tech Stack
 
-### High-Level Architecture
+**Frontend** — React 18 · TypeScript · Vite · Tailwind CSS · shadcn/ui · Three.js / `@react-three/fiber` · React Query · Socket.io client
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Frontend (React)                      │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  Dashboard | Explorer | Inspection | Documentation  │   │
-│  └──────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-          │ HTTP/WebSocket │ Vite Dev Proxy (localhost:8080)
-          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Backend (Express.js)                      │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  Auth Routes │ NEO Routes │ Watchlist Routes         │   │
-│  ├──────────────────────────────────────────────────────┤   │
-│  │  Middleware: Auth | Validation | Error Handling      │   │
-│  ├──────────────────────────────────────────────────────┤   │
-│  │  Services: NASA API Integration | Socket.io Manager  │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                    (localhost:5001)                          │
-└─────────────────────────────────────────────────────────────┘
-          │ Mongoose ODM │
-          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                  MongoDB Database                           │
-│  ┌──────────────────────────────────────────────────────┐   │
-│  │  Users | Watchlists | Authenticated Sessions        │   │
-│  └──────────────────────────────────────────────────────┘   │
-│                    (localhost:27017)                         │
-└─────────────────────────────────────────────────────────────┘
-```
+**Backend** — Node.js · Express · MongoDB (Mongoose) · JWT · bcryptjs · Socket.io · OpenAI SDK
 
-### Data Flow
-
-1. **User Authentication** → JWT token stored in localStorage
-2. **API Requests** → Bearer token in Authorization header
-3. **Real-time Updates** → WebSocket connection via Socket.io
-4. **External Data** → NASA NEO API integration
-5. **Storage** → MongoDB persistence for users and watchlists
+**DevOps** — Docker · Docker Compose · nginx
 
 ---
 
-## 🛠️ Tech Stack
+## Running the Project
 
-### Frontend
-| Category | Technology | Purpose |
-|----------|-----------|---------|
-| **Framework** | React 18 | UI library |
-| **Language** | TypeScript | Type safety |
-| **Build Tool** | Vite | Fast dev server & bundling |
-| **Styling** | Tailwind CSS | Utility-first CSS |
-| **UI Components** | shadcn/ui | Accessible component library |
-| **3D Graphics** | Three.js | Asteroid visualization |
-| **HTTP Client** | Axios | API requests |
-| **Real-time** | Socket.io Client | WebSocket communication |
-| **Forms** | react-hook-form | Form state management |
-| **Validation** | Zod | Schema validation |
-| **Testing** | Vitest | Unit testing |
+### Option A — Docker (recommended, one command)
 
-### Backend
-| Category | Technology | Purpose |
-|----------|-----------|---------|
-| **Runtime** | Node.js | JavaScript runtime |
-| **Framework** | Express.js | Web framework |
-| **Database** | MongoDB | NoSQL database |
-| **Authentication** | JWT + bcryptjs | Secure auth |
-| **Real-time** | Socket.io | WebSocket server |
-| **External API** | NASA NEO API | Asteroid data source |
-| **Validation** | express-validator | Input validation |
-| **Middleware** | Helmet, CORS, Compression | Security & optimization |
-| **Dev Tool** | Nodemon | Auto-restart on changes |
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
-### DevOps
-| Tool | Purpose |
-|------|---------|
-| **Docker** | Containerization |
-| **Docker Compose** | Multi-container orchestration |
-| **Nginx** | Reverse proxy & static serving |
+```bash
+# 1. Clone
+git clone https://github.com/Ritesh102472/nicerepo.git cosmic-watch
+cd cosmic-watch
+
+# 2. Set your secrets (optional but recommended)
+export JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+export NASA_API_KEY=your_nasa_api_key   # free at https://api.nasa.gov
+# export OPENAI_API_KEY=sk-...          # only needed for the AI impact feature
+
+# 3. Start all services
+docker compose up --build
+```
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:5001 |
+| Health check | http://localhost:5001/health |
+
+Stop with `Ctrl+C`, then `docker compose down`.
 
 ---
 
-## 📁 Project Structure
+### Option B — Local Development (no Docker)
 
-```
-stellar-monitor-desk-1/
-│
-├── frontend/                          # React application
-│   ├── src/
-│   │   ├── components/               # Reusable React components
-│   │   │   ├── 3d/                   # 3D visualization components
-│   │   │   ├── dashboard/            # Dashboard pages
-│   │   │   ├── ui/                   # shadcn/ui components
-│   │   │   ├── Navbar.tsx
-│   │   │   ├── ProtectedRoute.tsx
-│   │   │   └── SystemStatusBar.tsx
-│   │   ├── pages/                    # Page components
-│   │   │   ├── DashboardPage.tsx
-│   │   │   ├── ExplorerPage.tsx
-│   │   │   ├── AsteroidInspectionPage.tsx
-│   │   │   ├── DocumentationPage.tsx
-│   │   │   └── LoginPage.tsx
-│   │   ├── hooks/                    # Custom React hooks
-│   │   │   ├── useAsteroidFeed.ts    # Asteroid data fetching
-│   │   │   ├── useWatchlist.ts       # Watchlist management
-│   │   │   ├── useAlertSettings.ts   # Alert configuration
-│   │   │   └── useAsteroidLookup.ts  # Asteroid search
-│   │   ├── services/                 # API & external services
-│   │   │   ├── auth.ts               # Authentication service
-│   │   │   ├── nasa.ts               # NASA API client
-│   │   │   └── socket.ts             # Socket.io client
-│   │   ├── types/                    # TypeScript type definitions
-│   │   │   └── asteroid.ts
-│   │   ├── utils/                    # Utility functions
-│   │   │   ├── impactScenario.ts     # Collision calculations
-│   │   │   └── orbitalPhysics.ts     # Physics calculations
-│   │   ├── lib/                      # Library utilities
-│   │   │   ├── apiClient.ts          # Axios instance
-│   │   │   └── mapBackendAsteroid.ts # Data mapping
-│   │   ├── data/                     # Static data
-│   │   │   └── mockAsteroids.ts
-│   │   ├── App.tsx                   # Root component
-│   │   ├── main.tsx                  # Entry point
-│   │   └── index.css                 # Global styles
-│   ├── public/                        # Static assets
-│   │   └── textures/                 # 3D textures
-│   ├── vite.config.ts                # Vite configuration
-│   ├── tsconfig.json                 # TypeScript config
-│   ├── tailwind.config.ts            # Tailwind config
-│   ├── package.json
-│   └── Dockerfile                    # Container configuration
-│
-├── backend/                           # Express API server
-│   ├── src/
-│   │   ├── controllers/              # Request handlers
-│   │   │   ├── authController.js     # Auth logic
-│   │   │   ├── neoController.js      # NEO/Asteroid logic
-│   │   │   └── watchlistController.js # Watchlist logic
-│   │   ├── routes/                   # API routes
-│   │   │   ├── authRoutes.js
-│   │   │   ├── neoRoutes.js
-│   │   │   └── watchlistRoutes.js
-│   │   ├── models/                   # MongoDB schemas
-│   │   │   ├── User.js               # User document
-│   │   │   └── Watchlist.js          # Watchlist document
-│   │   ├── middleware/               # Express middleware
-│   │   │   ├── auth.js               # JWT verification
-│   │   │   ├── error.js              # Error handling
-│   │   │   └── validation.js         # Input validation
-│   │   ├── services/                 # Business logic
-│   │   │   └── nasaService.js        # NASA API integration
-│   │   ├── utils/                    # Helper functions
-│   │   │   └── database.js           # MongoDB connection
-│   │   └── server.js                 # Entry point
-│   ├── package.json
-│   └── Dockerfile
-│
-├── docker-compose.yml                 # Frontend compose
-├── docker-compose.mongo.yml           # MongoDB compose
-├── nginx.conf                         # Nginx configuration
-│
-├── AI-LOG.md                          # AI assistance documentation
-├── README.md                          # This file
-└── .gitignore
-
-```
-
----
-
-## 🚀 Installation & Setup
-
-### Prerequisites
-
-- **Node.js 18+** - [Install](https://nodejs.org/)
-- **npm or Yarn** - Comes with Node.js
-- **MongoDB** - Local or Docker
-- **Git** - For version control
-- **Docker** (optional) - For containerized MongoDB
-
-### Step 1: Clone the Repository
+**Prerequisites:** Node.js 18+, MongoDB (local or [Atlas](https://www.mongodb.com/atlas))
 
 ```bash
-git clone <repository-url>
-cd stellar-monitor-desk-1
-```
-
-### Step 2: Setup MongoDB
-
-**Option A: Docker (Recommended)**
-```bash
-docker-compose -f docker-compose.mongo.yml up -d
-```
-
-**Option B: Local MongoDB**
-```bash
-mongod
-```
-
-### Step 3: Setup Backend
-
-```bash
-cd backend
-
-# Copy environment variables
-cp .env.example .env
-
-# Edit .env file with your values
-# - JWT_SECRET: Your secret key for JWT tokens
-# - NASA_API_KEY: Your NASA API key (or use DEMO_KEY)
-# - MONGODB_URI: MongoDB connection string (default: mongodb://localhost:27017/cosmic_watch)
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-# Server will run on http://localhost:5001
-```
-
-### Step 4: Setup Frontend
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-# Frontend will run on http://localhost:8080
-```
-
-### Step 5: Access the Application
-
-Open your browser and navigate to:
-```
-http://localhost:8080
-```
-
----
-
-## 🎯 Running the Project
-
-### Quick Start (All Services)
-
-```bash
-# Terminal 1: MongoDB
-docker-compose -f docker-compose.mongo.yml up -d
-
-# Terminal 2: Backend
-cd backend && npm run dev
-
-# Terminal 3: Frontend
-cd frontend && npm run dev
-```
-
-### Individual Commands
-
-**Backend Development**
-```bash
-cd backend
-npm run dev      # Start with auto-reload
-npm start        # Start without auto-reload
-npm test         # Run tests
-```
-
-**Frontend Development**
-```bash
-cd frontend
-npm run dev      # Start dev server
-npm run build    # Build for production
-npm run preview  # Preview production build
-npm run test     # Run tests
-npm run lint     # Run ESLint
-```
-
-### Docker Compose (Full Stack)
-
-```bash
-docker-compose up -d
-```
-
-This will start:
-- Frontend (port 3000)
-- Backend (port 5001)
-- MongoDB (port 27017)
-
----
-
-## 📡 API Documentation
-
-### Authentication Endpoints
-
-#### Sign Up
-```http
-POST /api/user/signup
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "securepassword"
-}
-
-Response: 201 Created
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIs..."
-}
-```
-
-#### Login
-```http
-POST /api/user/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "securepassword"
-}
-
-Response: 200 OK
-{
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIs..."
-}
-```
-
-#### Get Current User
-```http
-GET /api/user/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-
-Response: 200 OK
-{
-  "success": true,
-  "user": {
-    "id": "507f1f77bcf86cd799439011",
-    "name": "John Doe",
-    "email": "john@example.com"
-  }
-}
-```
-
-### Asteroid/NEO Endpoints
-
-#### Get NEO Feed
-```http
-GET /api/feed?start_date=2026-02-01&end_date=2026-02-28
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-
-Response: 200 OK
-{
-  "success": true,
-  "data": [
-    {
-      "id": "2000433",
-      "name": "Eros",
-      "diameter": { "min": 12.5, "max": 14.2 },
-      "distance": "0.1234 AU",
-      "velocity": "15.2 km/s",
-      "hazardous": false
-    },
-    ...
-  ]
-}
-```
-
-### Watchlist Endpoints
-
-#### Get Watchlist
-```http
-GET /api/watchlist
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-
-Response: 200 OK
-{
-  "success": true,
-  "watchlist": [
-    {
-      "id": "507f1f77bcf86cd799439011",
-      "asteroidId": "2000433",
-      "asteroidName": "Eros",
-      "notes": "Close approach in March",
-      "addedAt": "2026-02-08T10:30:00Z"
-    },
-    ...
-  ]
-}
-```
-
-#### Add to Watchlist
-```http
-POST /api/watchlist
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-Content-Type: application/json
-
-{
-  "asteroidId": "2000433",
-  "asteroidName": "Eros",
-  "asteroidData": { /* full asteroid data */ },
-  "notes": "Optional notes"
-}
-
-Response: 201 Created
-{
-  "success": true,
-  "watchlistItem": { /* created item */ }
-}
-```
-
-#### Remove from Watchlist
-```http
-DELETE /api/watchlist/:id
-Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
-
-Response: 200 OK
-{
-  "success": true,
-  "message": "Removed from watchlist"
-}
-```
-
----
-
-## 👨‍💻 Development Guide
-
-### Code Style & Standards
-
-- **TypeScript** - Use strict mode (`"strict": true`)
-- **ESLint** - Run `npm run lint` before commits
-- **Prettier** - Auto-format on save
-- **Components** - Functional components with hooks
-- **File Names** - PascalCase for components, camelCase for utilities
-
-### Frontend Development Workflow
-
-1. Create component in `src/components/`
-2. Define types in `src/types/`
-3. Add hooks if state management needed
-4. Style with Tailwind CSS classes
-5. Export from barrel files
-6. Import and use in pages
-
-### Backend Development Workflow
-
-1. Define MongoDB schema in `src/models/`
-2. Create route file in `src/routes/`
-3. Write controller logic in `src/controllers/`
-4. Add middleware as needed in `src/middleware/`
-5. Use services for external API calls
-6. Add validation middleware
-
-### Environment Variables
-
-**Backend (.env)**
-```env
-NODE_ENV=development
-PORT=5001
-MONGODB_URI=mongodb://localhost:27017/cosmic_watch
-JWT_SECRET=your-secret-key-here
-NASA_API_KEY=your-nasa-api-key
-CORS_ORIGIN=http://localhost:8080
-```
-
-**Frontend (.env - optional)**
-```env
-VITE_API_BASE_URL=http://localhost:5001
-VITE_SOCKET_URL=http://localhost:5001
-```
-
-### Testing
-
-```bash
-# Frontend tests
-cd frontend && npm run test:watch
-
-# Backend tests
-cd backend && npm test
-```
-
----
-
-## 🐳 Deployment
-
-### Docker Deployment
-
-Build and run containers:
-```bash
-docker-compose up --build
-```
-
-### Production Build
-
-**Frontend**
-```bash
-cd frontend
-npm run build
-# Output in dist/
+# 1. Clone
+git clone https://github.com/Ritesh102472/nicerepo.git cosmic-watch
+cd cosmic-watch
 ```
 
 **Backend**
+
 ```bash
 cd backend
-NODE_ENV=production npm start
+cp .env.example .env
+# Edit .env — set MONGODB_URI, JWT_SECRET, and optionally NASA_API_KEY / OPENAI_API_KEY
+npm install
+npm run dev          # runs on http://localhost:5001
 ```
 
-### Environment Configuration for Production
+**Frontend** (new terminal)
 
-Ensure these variables are set:
-- `NODE_ENV=production`
-- `JWT_SECRET=<strong-random-secret>`
-- `NASA_API_KEY=<valid-api-key>`
-- `MONGODB_URI=<production-mongodb-uri>`
-- `CORS_ORIGIN=<production-domain>`
-
----
-
-## 🤝 Contributing
-
-### Before Making Changes
-
-1. Create a new branch: `git checkout -b feature/your-feature`
-2. Make your changes
-3. Test thoroughly
-4. Run linter: `npm run lint`
-5. Commit with clear messages: `git commit -m "feat: add new feature"`
-6. Push and create a Pull Request
-
-### Commit Message Format
-
-```
-type: subject
-
-- feat: new feature
-- fix: bug fix
-- docs: documentation
-- style: formatting
-- refactor: code restructuring
-- test: test additions
-- chore: maintenance
-```
-
----
-
-## 📝 Documentation Files
-
-- **[AI-LOG.md](./AI-LOG.md)** - Details on LLM assistance during development
-- **[backend/README.md](./backend/README.md)** - Backend-specific documentation
-- **[frontend/README.md](./frontend/README.md)** - Frontend-specific documentation
-
----
-
-## 🐛 Troubleshooting
-
-### MongoDB Connection Failed
-```
-Error: connect ECONNREFUSED 127.0.0.1:27017
-```
-**Solution**: Start MongoDB: `docker-compose -f docker-compose.mongo.yml up -d`
-
-### Frontend Proxy Error
-```
-[vite] http proxy error: /api/...
-```
-**Solution**: Ensure backend is running on port 5001
-
-### Authentication Token Issues
-```
-401 Unauthorized
-```
-**Solution**: 
-- Clear localStorage
-- Log out and log back in
-- Check JWT_SECRET matches between sessions
-
-### Port Already in Use
-```
-Address already in use :::5001
-```
-**Solution**: 
 ```bash
-# Find process using port
-lsof -i :5001
+cd frontend
+npm install
+npm run dev          # runs on http://localhost:8080
+```
 
-# Kill process
-kill -9 <PID>
+Open **http://localhost:8080**. The Vite dev server proxies all `/api` requests to the backend automatically — no extra config needed.
+
+---
+
+## Environment Variables
+
+### Backend (`backend/.env`)
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `MONGODB_URI` | **Yes** | — | MongoDB connection string |
+| `JWT_SECRET` | **Yes** | *(dev warning)* | Secret for signing JWTs |
+| `PORT` | No | `5001` | Server port |
+| `NODE_ENV` | No | `development` | Set to `production` to enforce JWT_SECRET |
+| `NASA_API_KEY` | No | `DEMO_KEY` | NASA NeoWs API key (rate-limited without one) |
+| `OPENAI_API_KEY` | No | — | OpenAI key for the AI impact narrative feature |
+| `FRONTEND_URL` | No | `http://localhost:8080` | CORS allowed origin |
+
+> **Generate a strong JWT secret:**
+> ```bash
+> node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+> ```
+
+### Frontend (`frontend/.env`)
+
+No required variables for local dev. Optional overrides:
+
+| Variable | Description |
+|----------|-------------|
+| `BACKEND_URL` | Dev-server proxy target (default: `http://localhost:5001`) |
+| `VITE_NASA_API_KEY` | NASA key for the 3D Solar System component |
+| `VITE_SOCKET_URL` | Socket.io server URL override |
+
+---
+
+## API Reference
+
+All protected routes require `Authorization: Bearer <token>` or the `token` httpOnly cookie.
+
+### Auth — `POST /api/user/signup`
+```json
+{ "name": "Jane Doe", "email": "jane@example.com", "password": "secret123" }
+// → 201 { "success": true, "token": "..." }
+```
+
+### Auth — `POST /api/user/login`
+```json
+{ "email": "jane@example.com", "password": "secret123" }
+// → 200 { "success": true, "token": "..." }
+```
+
+### NEO feed — `GET /api/feed`
+```
+?start_date=2026-02-01&end_date=2026-02-28   # date-range mode
+?page=0&size=20&risk_level=high              # browse mode
+```
+
+### Asteroid detail — `GET /api/lookup/:asteroidId`
+
+### Public stats — `GET /api/stats` (no auth)
+
+### Watchlist — `GET /POST /DELETE /api/watchlist`
+
+Full collection available in [`Cosmic-Watch-API.postman_collection.json`](Cosmic-Watch-API.postman_collection.json).
+
+---
+
+## Project Structure
+
+```
+cosmic-watch/
+├── backend/
+│   └── src/
+│       ├── controllers/     authController · neoController · watchlistController · hypotheticalController
+│       ├── middleware/       auth · error · validation
+│       ├── models/           User · Watchlist
+│       ├── routes/           authRoutes · neoRoutes · watchlistRoutes
+│       ├── services/         nasaService (NASA API proxy + risk scoring + cache)
+│       ├── utils/            database
+│       ├── __tests__/        nasaService.test · auth.test (Node built-in test runner)
+│       └── server.js
+├── frontend/
+│   └── src/
+│       ├── components/       3d/ · dashboard/ · ui/ (shadcn)
+│       ├── hooks/            useAsteroidFeed · useWatchlist · useAlertSettings · …
+│       ├── pages/            Landing · Login · Dashboard · Explorer · AsteroidInspection · Documentation
+│       ├── services/         auth · socket · nasa
+│       ├── utils/            impactScenario · orbitalPhysics
+│       ├── lib/              apiClient · mapBackendAsteroid
+│       ├── test/             mapBackendAsteroid.test · impactScenario.test
+│       └── types/            asteroid
+├── docker-compose.yml
+├── docker-compose.mongo.yml  # MongoDB only (for local dev without Docker frontend)
+└── Cosmic-Watch-API.postman_collection.json
 ```
 
 ---
 
-## 📚 Learning Resources
+## Testing
 
-- [React Documentation](https://react.dev)
-- [Express.js Guide](https://expressjs.com)
-- [MongoDB Manual](https://docs.mongodb.com/manual)
-- [NASA NEO API](https://api.nasa.gov/#NeoWS)
-- [Socket.io Documentation](https://socket.io/docs)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs)
+```bash
+# Backend (Node built-in test runner — no extra dependencies)
+cd backend && npm test
 
----
+# Frontend (Vitest)
+cd frontend && npm test
+```
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
+Both suites run without a live database or API key.
 
 ---
 
-## 👥 Project Team
+## Deployment Notes
 
-**Original Hackathon**: Hackathon-COSMIC-WATCH
-
-**Current Development**: Full stack project with separated frontend and backend architecture.
-
----
-
-## 📞 Support & Contact
-
-For issues, questions, or suggestions:
-- Open an issue on GitHub
-- Contact the development team
-- Check existing documentation
+- Set `NODE_ENV=production` — the server enforces `JWT_SECRET` and stops with a clear error if it is missing.
+- Set `FRONTEND_URL` to your actual domain so CORS is properly restricted.
+- `DEMO_KEY` for NASA is heavily rate-limited (30 req/hour). Register a free key at https://api.nasa.gov.
+- The in-memory Socket.io chat store is reset on restart — acceptable for a single-instance deployment.
 
 ---
 
-## 🔄 Final Notes
+## Known Limitations
 
-This project demonstrates:
-- ✅ Full-stack JavaScript development
-- ✅ Real-time communication with WebSockets
-- ✅ RESTful API design
-- ✅ Modern frontend architecture
-- ✅ Authentication & security best practices
-- ✅ External API integration
-- ✅ DevOps & containerization
-- ✅ Responsive UI/UX design
-
-**All functionality preserved during folder reorganization. No breaking changes.**
+- Chat history is in-memory; messages are lost when the server restarts.
+- The 3D Solar System uses simplified Keplerian elements for asteroid positions (good enough for visualization, not precision tracking).
+- No email verification on signup.
 
 ---
 
-*Last Updated: February 8, 2026*
-*Project Status: Production Ready* ✅
-🐳 Running with Docker (Recommended)
+## Development Notes
 
-This project is fully containerized. The frontend, backend, and MongoDB database run together using Docker Compose.
+See [`AI-LOG.md`](AI-LOG.md) for a transparent account of how AI tools (Claude, Lovable, Cursor, Copilot) were used during development.
 
-Requirements
+---
 
-Install Docker Desktop
+## License
 
-Make sure Docker Desktop is running
-
-(No need to install Node.js, npm, or MongoDB locally.)
-
-Start the Application
-
-From the project root directory:
-
-docker compose up --build
-
-The first build may take a few minutes because dependencies and images are created.
-
-After startup, open:
-
-Frontend:
-
-http://localhost:3000
-
-Backend API:
-
-http://localhost:5001
-
-Health Check:
-
-http://localhost:5001/health
-Stop the Application
-
-Press:
-
-CTRL + C
-
-Then clean containers:
-
-docker compose down
-Run Again (Faster)
-
-After the first build:
-
-docker compose up
-What Docker Does
-
-Docker Compose starts three services:
-
-frontend → React app served via Nginx
-
-backend → Node.js + Express API
-
-mongo → MongoDB database
-
-All services communicate over a shared Docker network, allowing the project to run identically on any system.
-
-For Evaluators
-
-To run the project:
-
-docker compose up --build
-
-Then open:
-
-http://localhost:3000
-
-No additional setup required.
+MIT

@@ -183,5 +183,4 @@ However, the **core development, decision-making, testing, and refinement** rema
 
 ---
 
-*Last Updated: February 8, 2026*
-*Project: Cosmic Watch - Satellite Monitoring System*
+*Project: Cosmic Watch – NEO Monitoring System*
