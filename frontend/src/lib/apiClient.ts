@@ -3,9 +3,12 @@
  * Base URL: VITE_API_BASE_URL or same origin when proxied.
  */
 
+const RENDER_API = 'https://cosmic-watch-n9lu.onrender.com';
+
 const getApiBase = (): string => {
   const env = import.meta.env.VITE_API_BASE_URL;
   if (env) return env.replace(/\/$/, '');
+  if (import.meta.env.PROD) return RENDER_API;
   return '';
 };
 
